@@ -1,6 +1,8 @@
 import requests
+from flask import Flask,render_template,redirect,request
 
 
+app=Flask('__name__')
 def get_weather(city_name, api_key):
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     params = {
@@ -12,12 +14,21 @@ def get_weather(city_name, api_key):
     data = response.json()
     return data
 
-def main():
-    city="Tekkali"
+def main(city):
     apikey="342d5a92c1ca16b286cabb20b770ae37"
     weatherdata=get_weather(city,apikey)
     print(weatherdata)
-    print("weather ---",weatherdata['weather'][0]['main'])
-    
+    return weatherdata['weather'][0]['main']
+
+@app.route("/",methods=['POST','GET'])
+def index():
+    data=""
+    if request.method=='POST':
+        city=request.form['city']
+        data=main(city)
+
+    return render_template('index.html',data=data)
+
+
 if __name__=='__main__':
-    main()
+    app.run(debug=True)
